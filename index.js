@@ -2,7 +2,7 @@ const express = require( 'express' );
 const app = express();
 const cors = require( 'cors' );
 require( 'dotenv' ).config()
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 const { MongoClient } = require( 'mongodb' );
 
 //middleware
@@ -17,7 +17,8 @@ const run = async () => {
         await client.connect();
         console.log( 'Connected to MongoDB Database' );
 
-    } catch ( err ) {
+    }
+    catch ( err ) {
         console.error( err );
     }
     finally {
