@@ -5,6 +5,7 @@ const admin = require( "firebase-admin" );
 require( 'dotenv' ).config()
 const port = process.env.PORT || 5002;
 const { MongoClient } = require( 'mongodb' );
+const ObjectId = require( 'mongodb' ).ObjectId;
 
 const serviceAccount = JSON.parse( process.env.FIREBASE_SERVICE_ACCOUNT );
 
@@ -51,6 +52,13 @@ const run = async () => {
             const cursor = appointmentsCollection.find( query );
             const appointments = await cursor.toArray();
             res.json( appointments );
+        } )
+
+        app.get( 'appointments/:id', async ( req, res ) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId( id ) };
+            const result = await appointmentsCollection.findOne( query );
+            res.json( result );
         } )
 
         app.post( '/appointments', async ( req, res ) => {
