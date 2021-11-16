@@ -3,7 +3,7 @@ const app = express();
 const cors = require( 'cors' );
 const admin = require( "firebase-admin" );
 require( 'dotenv' ).config()
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 5002;
 const { MongoClient } = require( 'mongodb' );
 
 const serviceAccount = JSON.parse( process.env.FIREBASE_SERVICE_ACCOUNT );
@@ -88,6 +88,7 @@ const run = async () => {
 
         app.put( '/users/admin', verifyToken, async ( req, res ) => {
             const user = req.body;
+            console.log( user );
             const requester = req.decodedEmail;
             if ( requester ) {
                 const requesterAccount = await usersCollection.findOne( { email: requester } );
