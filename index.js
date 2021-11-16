@@ -68,6 +68,19 @@ const run = async () => {
             res.json( result );
         } )
 
+        app.put( '/appointments/:id', async ( req, res ) => {
+            const id = req.params.id;
+            const payment = req.body;
+            const query = { _id: ObjectId( id ) };
+            const updateDoc = {
+                $set: {
+                    payment: payment
+                }
+            };
+            const result = await appointmentsCollection.updateOne( query, updateDoc );
+            res.json( result );
+        } )
+
         app.get( '/users/:email', async ( req, res ) => {
             const email = req.params.email;
             const query = { email: email };
@@ -121,9 +134,9 @@ const run = async () => {
                 currency: 'usd',
                 amount: amount,
                 payment_method_types: [ 'card' ]
-            } );
+            } )
             res.json( { clientSecret: paymentIntent.client_secret } )
-        } );
+        } )
     }
     catch ( err ) {
         console.error( err );
