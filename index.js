@@ -7,6 +7,7 @@ const port = process.env.PORT || 5002;
 const { MongoClient } = require( 'mongodb' );
 const ObjectId = require( 'mongodb' ).ObjectId;
 const stripe = require( 'stripe' )( process.env.STRIPE_SECRET );
+const fileUpload = require( 'express-fileupload' );
 
 const serviceAccount = JSON.parse( process.env.FIREBASE_SERVICE_ACCOUNT );
 
@@ -18,6 +19,7 @@ admin.initializeApp( {
 //middleware
 app.use( cors() );
 app.use( express.json() );
+app.use( fileUpload() );
 
 const uri = `mongodb+srv://${ process.env.DB_USER }:${ process.env.DB_PASS }@cluster0.iezc6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient( uri, { useNewUrlParser: true, useUnifiedTopology: true } );
@@ -45,6 +47,7 @@ const run = async () => {
         const database = client.db( 'doctors_portal' );
         const appointmentsCollection = database.collection( 'appointments' );
         const usersCollection = database.collection( 'users' );
+        const doctorsCollection = database.collection( 'users' );
 
         app.get( '/appointments', verifyToken, async ( req, res ) => {
             const email = req.query.email;
@@ -136,6 +139,22 @@ const run = async () => {
                 payment_method_types: [ 'card' ]
             } )
             res.json( { clientSecret: paymentIntent.client_secret } )
+        } )
+
+        app.post( '/doctors', async ( req, res ) => {
+            const name = req.body.name;
+            const email = req.body.email;
+            const image = req.files.image;
+            const imageData = image.data;
+            const encodeImage = imageData.toString( 'base64' );
+            const imageBuffer = Buffer.from( encodeImage, 'base64' );
+            const doctor = {
+                name,
+                email,
+                image: imageBuffer
+            }
+            const result = await doctorsCollection.insertOne( doctor );
+            res.json( result );
         } )
     }
     catch ( err ) {
